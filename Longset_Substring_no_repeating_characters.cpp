@@ -1,47 +1,26 @@
 #include <iostream>
-#include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 using namespace std;
 
-unordered_map<string, int> countSub(const string& str, int length){
-        unordered_map<string, int> subCount;
-        for(size_t i=0; i<=str.size() - length; i++){
-            string sub = str.substr(i, length);
-            subCount[sub]++;
-        }
-        return subCount;
-    }
-    
 int SubstringCount(const string& s){
-        int sub_size=0;
-        //int len =1;
-    //get all possible substrings    
-    unordered_map<string, int> result; // Declare outside the loop
-    for (int len = 0; len <= s.size(); ++len) {
-        auto partialResult = countSub(s, len);
-        for (const auto& pair : partialResult) {
-            result[pair.first] += pair.second; // Accumulate counts
+    unordered_set<char> seen; // Set to store characters in the current window (no duplicates allowed)
+    int left = 0, right = 0;  // Two pointers defining the sliding window
+    int sub_size = 0;         // Keeps track of the maximum length found so far
+
+    while (right < s.length()) { // Loop until the right pointer reaches the end of the string
+        if (!seen.count(s[right])) { // If current character is not in the set (i.e., not a duplicate)
+        //this piece of code accesses the character at the index before being updating to next value. a two in one solution essentially
+            seen.insert(s[right++]); // Add character to set and move right pointer forward
+            sub_size = max(sub_size, right - left); // Update max length if current window is larger
+        } else {
+            // If duplicate found, shrink window from the left by removing characters
+            seen.erase(s[left++]); // Remove leftmost character and move left pointer forward
         }
     }
-    
-    //iterate through map
-    int largest=0, current=0;
-        for(const auto& pair : result){
-            cout << pair.first << ": " << pair.second << endl;
-            //checks if sub string is the same string
-            const string& sub = pair.first;
-            /*if substring is recognized repeated as many times as the size of string, then check if string consists of a single repeated character*/
-                if(pair.second == s.size()){
-                    return sub_size =1;
-                }
-           // if()
-                
-                
-            
-            
-        }
-return sub_size;
+
+    return sub_size; // Return the length of the longest substring with all unique characters
 }
 
 int main() {
